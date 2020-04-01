@@ -16,7 +16,8 @@
    + bash test.sh
    + 输出文件夹生成预测文件test_prediction.csv，用于提交
 ** 线上线下结果对比
-#+DOWNLOADED: file:/var/folders/73/53s3wczx1l32608prn_fdgrm0000gn/T/TemporaryItems/（screencaptureui正在存储文稿，已完成55）/截屏2020-04-01 下午2.50.07.png @ 2020-04-01 14:50:16
-[[file:Screen-Pictures/CCF%E7%96%AB%E6%83%85%E9%97%AE%E7%AD%94%E5%8A%A9%E6%89%8Bbaseline/2020-04-01_14-50-16_%E6%88%AA%E5%B1%8F2020-04-01%20%E4%B8%8B%E5%8D%882.50.07.png]]
-| model             |   lr | max_seq_length | max_question_length | eval_score | test_score |
-| roberta-large-wwm | 1e-5 |            512 |                  96 |       0.76 |     0.5298 |
+| model         |   lr | max_seq_length | max_question_length | eval_score | test_score |
+| bert-base-wwm | 1e-5 |            512 |                  96 |     0.7207 |     0.5198 |
+#+DOWNLOADED: file:/var/folders/73/53s3wczx1l32608prn_fdgrm0000gn/T/TemporaryItems/（screencaptureui正在存储文稿，已完成56）/截屏2020-04-01 下午4.03.51.png @ 2020-04-01 16:03:54
+[[file:Screen-Pictures/CCF%E7%96%AB%E6%83%85%E9%97%AE%E7%AD%94%E5%8A%A9%E6%89%8Bbaseline/2020-04-01_16-03-54_%E6%88%AA%E5%B1%8F2020-04-01%20%E4%B8%8B%E5%8D%884.03.51.png]]
+预计用更大的预训练模型能提升几个点

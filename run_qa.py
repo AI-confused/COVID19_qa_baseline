@@ -28,7 +28,7 @@ import json
 import math
 from transformers import BertTokenizer, AdamW, BertModel, BertPreTrainedModel, BertConfig, get_cosine_schedule_with_warmup
 from model_nq import BertForQuestionAnswering
-from prepare_data import InputExample,Feature,read_examples,convert_examples_to_features,TextDataset,collate_fn,set_seed,Result,eval_collate_fn,pre_process
+from prepare_data import InputExample,Feature,read_examples,convert_examples_to_features,TextDataset,collate_fn,set_seed,Result,eval_collate_fn,pre_process,FGM
 from itertools import cycle
 
 logging.basicConfig(format = '%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
@@ -112,6 +112,7 @@ def main():
         # Prepare model
         model = BertForQuestionAnswering.from_pretrained(args.model_name_or_path, config=config)
         model.to(device)
+        fgm = FGM(model)
 
         if args.n_gpu > 1:
             model = torch.nn.DataParallel(model)
@@ -186,7 +187,15 @@ def main():
             nb_tr_steps += 1
 
             loss.backward()
-         
+              # 对抗训练
+            fgm.attack() # 在embedding上添加对抗扰动
+            loss_adv = model(input_ids=input_ids.to(device), token_type_ids=segment_ids.to(device), attention_mask=input_mask.to(device), labels=y_label)
+            if args.n_gpu > 1:
+                loss_adv = loss_adv.mean() # mean() to average on multi-gpu.
+            if args.gradient_accumulation_steps > 1:
+                loss_adv = loss_adv / args.gradient_accumulation_steps
+            loss_adv.backward() # 反向传播，并在正常的grad基础上，累加对抗训练的梯度
+            fgm.restore() # 恢复embedding参数
 
             if (nb_tr_steps + 1) % args.gradient_accumulation_steps == 0:
                 optimizer.step()

@@ -15,4 +15,4 @@ python run_qa.py \
 --per_gpu_train_batch_size 16 \
 --per_gpu_eval_batch_size 16 \
 --learning_rate 1e-5 \
---train_steps 800
+--train_steps 1000
