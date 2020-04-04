@@ -15,7 +15,8 @@ def dispose_train(train_df, passage_df, clean_train_dir):
         end = start+ans_l
         s.append(start)
         e.append(end)  
-        if val[-1]!=passage[start:end]:#如果训练集中存在答案不能和文档匹配情况
+        #如果训练集中存在答案不能和文档匹配情况，去除该训练样本
+        if val[-1]!=passage[start:end]:
             a.append(i)
                     
     train_df['start_index']=s
@@ -28,20 +29,20 @@ def clean_data(train_dir, clean_train_dir, passage_dir, clean_passage_dir, test_
     #clean passage file
     passage = pd.read_csv(passage_dir)
     for i in passage.index:
-        passage.iloc[i,-1] = passage.iloc[i,-1].replace(' ','')
+        passage.iloc[i,-1] = passage.iloc[i,-1].replace(' ', '').replace('\t', '')
 
     passage.to_csv(clean_passage_dir, index=False,header=True)
     #clean train file
     train = pd.read_csv(train_dir, sep='\t')
     for i in train.index:
-        train.iloc[i,2] = train.iloc[i,2].replace(' ','')
-        train.iloc[i,3] = train.iloc[i,3].replace(' ','')
+        train.iloc[i,2] = train.iloc[i,2].replace(' ','').replace('\t', '')
+        train.iloc[i,3] = train.iloc[i,3].replace(' ','').replace('\t', '')
     
     dispose_train(train, passage, clean_train_dir)
     #clean test file
     test = pd.read_csv(test_dir)
     for i in test.index:
-        test.iloc[i,-1] = test.iloc[i,-1].replace(' ','')
+        test.iloc[i,-1] = test.iloc[i,-1].replace(' ','').replace('\t', '')
 
     test.to_csv(clean_test_dir, index=False,header=True)
     print('clean done')
@@ -50,18 +51,15 @@ def clean_data(train_dir, clean_train_dir, passage_dir, clean_passage_dir, test_
 class ElasticObj:
     def __init__(self, index_name,index_type,ip ="127.0.0.1"):
         '''
-        :param index_name: 索引名称
-        :param index_type: 索引类型
+        构建es索引，批量导入数据
         '''
         self.index_name =index_name
         self.index_type = index_type
-        # 无用户名密码状态
         self.es = Elasticsearch([ip])
 
     def bulk_Index_Data(self, csvfile):
         '''
         用bulk将批量数据存储到es
-        :return:
         '''
         df = pd.read_csv(csvfile)
         doc = []
@@ -82,7 +80,6 @@ class ElasticObj:
             }
             i += 1
             ACTIONS.append(action)
-            # 批量处理
         print('index_num:',i)
         success, _ = bulk(self.es, ACTIONS, index=self.index_name, raise_on_error=True)
         print('Performed %d actions' % success)
@@ -90,9 +87,7 @@ class ElasticObj:
 
     def create_index(self,index_name,index_type):
         '''
-        创建索引,创建索引名称为ott，类型为ott_type的索引
-        :param ex: Elasticsearch对象
-        :return:
+        创建索引
         '''
         #创建映射
         _index_mappings = {
@@ -109,6 +104,7 @@ class ElasticObj:
                         }
             }
         }
+        #构建索引
         if self.es.indices.exists(index=self.index_name) is not True:
             res = self.es.indices.create(index=self.index_name, body=_index_mappings)
             print(res)

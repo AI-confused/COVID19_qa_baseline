@@ -136,7 +136,6 @@ def main():
         num_train_optimization_steps =  args.train_steps
 
         # Prepare optimizer
-
         param_optimizer = list(model.named_parameters())
 
         #optimizer
@@ -187,15 +186,18 @@ def main():
             nb_tr_steps += 1
 
             loss.backward()
-              # 对抗训练
+            
+             # 对抗训练
             fgm.attack() # 在embedding上添加对抗扰动
             loss_adv = model(input_ids=input_ids.to(device), token_type_ids=segment_ids.to(device), attention_mask=input_mask.to(device), labels=y_label)
             if args.n_gpu > 1:
-                loss_adv = loss_adv.mean() # mean() to average on multi-gpu.
+                loss_adv = loss_adv.mean()
             if args.gradient_accumulation_steps > 1:
                 loss_adv = loss_adv / args.gradient_accumulation_steps
-            loss_adv.backward() # 反向传播，并在正常的grad基础上，累加对抗训练的梯度
-            fgm.restore() # 恢复embedding参数
+            # 反向传播，并在正常的grad基础上，累加对抗训练的梯度
+            loss_adv.backward() 
+            # 恢复embedding参数
+            fgm.restore() 
 
             if (nb_tr_steps + 1) % args.gradient_accumulation_steps == 0:
                 optimizer.step()

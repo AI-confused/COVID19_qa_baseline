@@ -1,11 +1,14 @@
 * CCF疫情问答助手baseline
+** 安装依赖包
+   + pip install -r requirements.txt
 ** ES导入文档索引&数据预处理
-   + 为了在预测答案中用到检索功能，需要提前在服务器把ES搭建好，并把文档导入节点，最好把kibana装好https://blog.csdn.net/zjh_746140129/article/details/86483661
+   + 为了在预测答案中用到检索功能，需要提前在服务器把ES搭建好，并把文档导入节点 https://blog.csdn.net/zjh_746140129/article/details/86483661
    + 安装过程中可能遇到的报错 https://blog.csdn.net/feng12345zi/article/details/80367907
    + 装好ES中文分词插件ik
    + 在preprocess.sh中修改相应的参数，尤其是es索引的名字和ip，默认是passages和localhost
    + bash preprocess.sh，这里默认的pandas读取train,passage,test的sep分别是\t , ,
    + 如果不一致需要在preprocess.py的clean_data()做修改
+   + 清洗完后会发现训练集变成了4995个，因为有5个样本的答案不能在文档中找到
 ** 训练
    + 将清洗好的训练集拆分为训练集和验证集，在train.sh中修改相应的参数
    + bash train.sh
