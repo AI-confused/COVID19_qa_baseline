@@ -1,4 +1,6 @@
 * CCF疫情问答助手baseline
+** 安装依赖
+   + pip install -r requirements.txt
 ** ES导入文档索引&数据预处理
    + 为了在预测答案中用到检索功能，需要提前在服务器把ES搭建好，并把文档导入节点，最好把kibana装好https://blog.csdn.net/zjh_746140129/article/details/86483661
    + 安装过程中可能遇到的报错 https://blog.csdn.net/feng12345zi/article/details/80367907
